@@ -1,25 +1,17 @@
-package az.code.travelTechdemo.auth;
+package az.code.travelTechdemo.models.request;
 
+import az.code.travelTechdemo.entities.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class RegisterRequest {
-
-    private String firstName;
-
-    private String lastName;
-
     private String email;
-
-    private String phoneNumber;
-
-    private String username;
-
     private String password;
+    private Role role;
 }

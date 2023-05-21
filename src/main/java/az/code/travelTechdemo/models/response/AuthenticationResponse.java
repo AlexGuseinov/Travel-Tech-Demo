@@ -1,17 +1,14 @@
-package az.code.travelTechdemo.auth;
+package az.code.travelTechdemo.models.response;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class AuthenticationRequest {
-
-    private String username;
-
-    private String password;
-
+public class AuthenticationResponse {
+    private String token;
 }

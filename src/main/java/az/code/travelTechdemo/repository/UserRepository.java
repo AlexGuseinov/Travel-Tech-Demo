@@ -1,11 +1,14 @@
 package az.code.travelTechdemo.repository;
 
-import az.code.travelTechdemo.models.entities.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
+import az.code.travelTechdemo.entities.User;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends JpaRepository<User, Integer> {
-    Optional<User> findAllByUsername(String userName);
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+
+  boolean existsStudentByEmail(String email);
+
+  Optional<User> findUserByEmail(String email);
 }

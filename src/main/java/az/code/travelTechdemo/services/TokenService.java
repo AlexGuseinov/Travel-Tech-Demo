@@ -1,4 +1,4 @@
-package az.code.travelTechdemo.services.impl;
+package az.code.travelTechdemo.services;
 
 public interface TokenService {
     String extractUserName(String token);
