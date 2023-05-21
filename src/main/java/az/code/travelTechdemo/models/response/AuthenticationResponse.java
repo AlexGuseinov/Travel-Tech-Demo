@@ -1,4 +1,4 @@
-package az.code.travelTechdemo.auth;
+package az.code.travelTechdemo.models.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthenticationResponse {
-
     private String token;
 }

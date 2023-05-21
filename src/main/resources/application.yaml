@@ -14,3 +14,8 @@ spring:
     database: postgresql
 
 
+cors:
+  allowed-origins: "*"
+  allowed-methods: "*"
+  allowed-headers: "*"
+  exposed-headers: "*"
