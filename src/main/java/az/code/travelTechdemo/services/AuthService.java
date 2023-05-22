@@ -21,7 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
+//    private final UserRepository userRepository;
+    private final UserServiceimpl userService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -30,15 +31,15 @@ public class AuthService {
 
     public AuthenticationResponse register(RegisterRequest registerRequest){
         User user = User.builder()
-                .firstName(registerRequest.getFirstName())
-                .lastName(registerRequest.getLastName())
+//                .firstName(registerRequest.getFirstName())
+//                .lastName(registerRequest.getLastName())
                 .email(registerRequest.getEmail())
-                .phoneNumber(registerRequest.getPhoneNumber())
-                .username(registerRequest.getUsername())
+//                .phoneNumber(registerRequest.getPhoneNumber())
+//                .username(registerRequest.getUsername())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .role(Role.User)
                 .build();
-        User savedUser = userRepository.save(user);
+        User savedUser = userService.saveUser(user);
         String jwtToken = jwtService.generateToken(user);
         saveUserToken(savedUser,jwtToken);
         return AuthenticationResponse.builder().token(jwtToken).build();
@@ -47,11 +48,11 @@ public class AuthService {
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest){
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        authenticationRequest.getUsername(),
+                        authenticationRequest.getEmail(),
                         authenticationRequest.getPassword()
                 )
         );
-        User user = userRepository.findAllByUsername(authenticationRequest.getUsername()).orElseThrow();
+        User user = userService.getUserByEmail(authenticationRequest.getEmail());
         String jwtToken = jwtService.generateToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);

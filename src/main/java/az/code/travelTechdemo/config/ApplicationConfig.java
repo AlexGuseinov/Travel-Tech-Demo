@@ -19,7 +19,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class ApplicationConfig {
 
-    private final UserRepository userRepository;
+//    private final UserRepository userRepository;
+
+    private final UserServiceimpl userService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -28,8 +30,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findAllByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return userService::getUserByEmail;
     }
 
     @Bean
