@@ -2,6 +2,7 @@ package az.code.travelTechdemo.services.impl;
 
 import az.code.travelTechdemo.entities.Token;
 import az.code.travelTechdemo.entities.User;
+import az.code.travelTechdemo.entities.enums.Role;
 import az.code.travelTechdemo.entities.enums.TokenType;
 import az.code.travelTechdemo.exception.DuplicateResourceException;
 import az.code.travelTechdemo.mapper.UserMapper;
@@ -48,7 +49,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         var user = userMapper.mapToUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-
+        user.setRole(Role.USER);
 
         var roles = user.getAuthorities()
             .stream()
