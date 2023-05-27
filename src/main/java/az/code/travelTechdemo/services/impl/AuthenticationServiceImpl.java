@@ -13,6 +13,8 @@ import az.code.travelTechdemo.repository.TokenRepository;
 import az.code.travelTechdemo.repository.UserRepository;
 import az.code.travelTechdemo.security.jwt.JWTUtil;
 import az.code.travelTechdemo.services.AuthenticationService;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final TokenRepository tokenRepository;
     private final AuthenticationManager authenticationManager;
+    private final MailSenderImpl mailSender;
 
     @Override
     public AuthenticationResponse register(RegisterRequest request){
@@ -69,11 +73,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse login(AuthenticationRequest request){
-        log.info("login().start username: {}", request.getUsername());
+        log.info("login().start username: {}", request.getEmail());
 
         var authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
-                request.getUsername(),
+                request.getEmail(),
                 request.getPassword()
             )
         );
@@ -119,4 +123,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         tokenRepository.saveAll(validUserTokens);
     }
+
+    //todo test
+
+    public String generatePasswordResetLink(String email) {
+        User user = userRepository.findByEmail(email);
+        String token = jwtUtil.generateToken(user.getEmail());
+        return "http://localhost:8080/v1/travel/auth/reset-password?token=" + token;
+    }
+    public String forgetPassword(String email) throws IOException {
+        if (userRepository.existsStudentByEmail(email)) {
+            String resetLink = generatePasswordResetLink(email);
+            mailSender.sendPasswordResetEmail(userRepository.findByEmail(email), resetLink);
+            return "size mail gonderdik";
+        } else {
+            throw new UsernameNotFoundException("this user doesn't exist: " + email);
+        }
+    }
+
 }

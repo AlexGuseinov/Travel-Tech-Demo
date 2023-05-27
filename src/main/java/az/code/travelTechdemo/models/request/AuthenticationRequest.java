@@ -1,4 +1,5 @@
-package az.code.travelTechdemo.auth;
+package az.code.travelTechdemo.models.request;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

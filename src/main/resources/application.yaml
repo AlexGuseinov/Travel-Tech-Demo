@@ -12,6 +12,17 @@ spring:
         format_sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     database: postgresql
+  mail:
+    host: smtp.gmail.com
+    username: aliyh@code.edu.az
+    password: Jesse12345@
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 
 cors:
@@ -19,3 +30,5 @@ cors:
   allowed-methods: "*"
   allowed-headers: "*"
   exposed-headers: "*"
+
+

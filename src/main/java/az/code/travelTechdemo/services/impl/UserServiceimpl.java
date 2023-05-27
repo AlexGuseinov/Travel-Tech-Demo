@@ -1,8 +1,8 @@
-package az.code.travelTechdemo.services;
+package az.code.travelTechdemo.services.impl;
 
-import az.code.travelTechdemo.models.entities.User;
+import az.code.travelTechdemo.entities.User;
 import az.code.travelTechdemo.repository.UserRepository;
-import az.code.travelTechdemo.services.impl.UserService;
+import az.code.travelTechdemo.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ public class UserServiceimpl implements UserService {
 
     public User getUserByEmail(String email) {
         return userRepository.findAllByEmail(email).orElseThrow(
-                () -> new UsernameNotFoundException("Couldn't found the user!!")
+                () -> new UsernameNotFoundException("Couldn't found the user: " + email)
         );
     }
 
@@ -29,5 +29,7 @@ public class UserServiceimpl implements UserService {
             userRepository.save(user);
         return user;
     }
+
+
 
 }

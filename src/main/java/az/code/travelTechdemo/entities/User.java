@@ -1,6 +1,6 @@
-package az.code.travelTechdemo.models.entities;
+package az.code.travelTechdemo.entities;
 
-import az.code.travelTechdemo.models.enums.Role;
+import az.code.travelTechdemo.entities.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -53,6 +53,7 @@ public class User implements UserDetails {
     //TODO List<Like> likes
     //TODO List<User> follower - many many
     //TODO List<User> following
+
 
 
     @Override
