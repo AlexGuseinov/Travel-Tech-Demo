@@ -44,6 +44,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final MailSenderImpl mailSender;
     private final EmailTexts emailTexts;
+    private final OTPServiceImpl otpService;
 
 
     @Override
@@ -138,17 +139,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     public String forgetPassword(String email){
         if (userRepository.existsStudentByEmail(email)) {
-
             EmailDetails emailDetails = new EmailDetails();
-
             emailDetails.setRecipient(email);
-            emailDetails.setMsgBody(emailTexts.getEmailBody()+"OTP (GUYA)");
+            emailDetails.setMsgBody(emailTexts.getEmailBody() + " OTP ->  " + otpService.createOTP(email).getOtp());
             emailDetails.setSubject(emailTexts.getEmailSubject());
-
             return mailSender.sendSimpleMail(emailDetails);
         } else {
             throw new UsernameNotFoundException("this user doesn't exist: " + email);
         }
     }
 
+    public boolean otpCheck(String email,String otp){
+        return otpService.verifyOTP(email,otp);
+    }
 }
