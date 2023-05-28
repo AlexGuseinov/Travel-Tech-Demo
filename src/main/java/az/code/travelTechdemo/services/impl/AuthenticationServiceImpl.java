@@ -1,5 +1,6 @@
 package az.code.travelTechdemo.services.impl;
 
+import az.code.travelTechdemo.entities.EmailDetails;
 import az.code.travelTechdemo.entities.Token;
 import az.code.travelTechdemo.entities.User;
 import az.code.travelTechdemo.entities.enums.Role;
@@ -13,14 +14,18 @@ import az.code.travelTechdemo.repository.TokenRepository;
 import az.code.travelTechdemo.repository.UserRepository;
 import az.code.travelTechdemo.security.jwt.JWTUtil;
 import az.code.travelTechdemo.services.AuthenticationService;
+
 import java.util.List;
 import java.util.Objects;
+
+import az.code.travelTechdemo.util.EmailTexts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,9 +42,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final TokenRepository tokenRepository;
     private final AuthenticationManager authenticationManager;
+    private final MailSenderImpl mailSender;
+    private final EmailTexts emailTexts;
+
 
     @Override
-    public AuthenticationResponse register(RegisterRequest request){
+    public AuthenticationResponse register(RegisterRequest request) {
         log.info("register().start email: {}", request.getEmail());
 
         String email = request.getEmail();
@@ -52,13 +60,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setRole(Role.USER);
 
         var roles = user.getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .toList();
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
         var savedUser = userRepository.save(user);
         String jwtToken = jwtUtil.generateToken(user.getUsername(), roles);
-        saveUserToken(savedUser,jwtToken);
+        saveUserToken(savedUser, jwtToken);
 
         Objects.requireNonNull(cacheManager.getCache("response")).clear();
 
@@ -68,22 +76,22 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AuthenticationResponse login(AuthenticationRequest request){
-        log.info("login().start username: {}", request.getUsername());
+    public AuthenticationResponse login(AuthenticationRequest request) {
+        log.info("login().start username: {}", request.getEmail());
 
         var authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.getUsername(),
-                request.getPassword()
-            )
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
         );
 
         var user = (User) authentication.getPrincipal();
 
         var roles = user.getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)
-            .toList();
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
         String jwtToken = jwtUtil.generateToken(user.getEmail(), roles);
 
@@ -92,7 +100,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         log.info("login().end user-id: {}", user.getId());
 
-        return  AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
     private void saveUserToken(User user, String jwtToken) {
@@ -119,4 +127,28 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         tokenRepository.saveAll(validUserTokens);
     }
+
+    //todo test
+
+//    public String generatePasswordResetLink(String email) {
+//        User user = userRepository.findByEmail(email);
+//        String token = jwtUtil.generateToken(user.getEmail());
+//        return "http://localhost:8080/v1/travel/auth/reset-password?token=" + token;
+//    }
+
+    public String forgetPassword(String email){
+        if (userRepository.existsStudentByEmail(email)) {
+
+            EmailDetails emailDetails = new EmailDetails();
+
+            emailDetails.setRecipient(email);
+            emailDetails.setMsgBody(emailTexts.getEmailBody()+"OTP (GUYA)");
+            emailDetails.setSubject(emailTexts.getEmailSubject());
+
+            return mailSender.sendSimpleMail(emailDetails);
+        } else {
+            throw new UsernameNotFoundException("this user doesn't exist: " + email);
+        }
+    }
+
 }
