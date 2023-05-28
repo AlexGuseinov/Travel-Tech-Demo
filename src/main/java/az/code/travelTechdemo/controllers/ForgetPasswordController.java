@@ -20,6 +20,7 @@ public class ForgetPasswordController {
     public ResponseEntity<String> forgetPassword(@RequestParam String email) throws IOException {
                 return ResponseEntity.ok(authenticationService.forgetPassword(email));
     }
+
     @GetMapping("/reset-password")
     public ResponseEntity<String> forgetPassword() {
         return ResponseEntity.ok("alalalaa codu yaz davay!!");

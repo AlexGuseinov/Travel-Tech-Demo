@@ -14,8 +14,8 @@ spring:
     database: postgresql
   mail:
     host: smtp.gmail.com
-    username: aliyh@code.edu.az
-    password: Jesse12345@
+    username: ali.guseynof2503@gmail.com
+    password: wdtvlxfmkrzogplt
     port: 587
     properties:
       mail:
