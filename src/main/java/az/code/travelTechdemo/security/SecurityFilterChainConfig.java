@@ -28,6 +28,7 @@ public class SecurityFilterChainConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests()
                 .requestMatchers("v1/travel/auth/**").permitAll()
+                .requestMatchers("v1/travel/auth/forgetpassword/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 //                .requestMatchers("/swagger-ui/**/**").permitAll()
                 .requestMatchers("/swagger-ui.html").permitAll()

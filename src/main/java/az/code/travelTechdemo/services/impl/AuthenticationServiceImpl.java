@@ -8,6 +8,7 @@ import az.code.travelTechdemo.entities.enums.TokenType;
 import az.code.travelTechdemo.exception.DuplicateResourceException;
 import az.code.travelTechdemo.mapper.UserMapper;
 import az.code.travelTechdemo.models.request.AuthenticationRequest;
+import az.code.travelTechdemo.models.request.PasswordResetRequest;
 import az.code.travelTechdemo.models.request.RegisterRequest;
 import az.code.travelTechdemo.models.response.AuthenticationResponse;
 import az.code.travelTechdemo.repository.TokenRepository;
@@ -103,6 +104,29 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
+    public AuthenticationResponse passwordReset(PasswordResetRequest passwordResetRequest){
+        log.info("password-reset().start username: {}", passwordResetRequest.getEmail());
+
+        String email = passwordResetRequest.getEmail();
+        var user = userRepository.findAllByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("No such username(email)"));
+
+        user.setPassword(passwordEncoder.encode(passwordResetRequest.getNewPassword()));
+        user.setRole(Role.USER);
+
+        var roles = user.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        String jwtToken = jwtUtil.generateToken(user.getUsername(), roles);
+        saveUserToken(user, jwtToken);
+        Objects.requireNonNull(cacheManager.getCache("response")).clear();
+
+        log.info("PasswordReset().end user-id: {}", user.getId());
+
+        return AuthenticationResponse.builder().token(jwtToken).build();
+    }
 
     private void saveUserToken(User user, String jwtToken) {
         Token token = Token.builder()
@@ -125,17 +149,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             token.setExpired(true);
             token.setRevoked(true);
         });
-
         tokenRepository.saveAll(validUserTokens);
     }
 
-    //todo test
-
-//    public String generatePasswordResetLink(String email) {
-//        User user = userRepository.findByEmail(email);
-//        String token = jwtUtil.generateToken(user.getEmail());
-//        return "http://localhost:8080/v1/travel/auth/reset-password?token=" + token;
-//    }
 
     public String forgetPassword(String email){
         if (userRepository.existsStudentByEmail(email)) {
